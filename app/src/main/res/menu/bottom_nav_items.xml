@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/menu_group"
+        android:checkableBehavior="none">
+
+        <item
+            android:id="@+id/menu_category"
+            android:title="@string/menu_category"
+            android:icon="@android:drawable/ic_menu_search" />
+
+        <item
+            android:id="@+id/menu_rate_us"
+            android:title="@string/menu_rate_us"
+            android:icon="@android:drawable/star_off" />
+
+        <item
+            android:id="@+id/menu_share_app"
+            android:title="@string/menu_share_app"
+            android:icon="@android:drawable/ic_menu_share"
+            android:actionProviderClass="android.widget.ShareActionProvider"/>
+
+        <item
+            android:id="@+id/menu_suggest"
+            android:title="@string/menu_suggest"
+            android:icon="@android:drawable/ic_menu_edit" />
+
+    </group>
+
+</menu>
