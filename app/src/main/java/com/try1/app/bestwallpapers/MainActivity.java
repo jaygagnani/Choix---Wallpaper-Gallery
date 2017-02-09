@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
             imageSummaryList = getImagesFromS3Bucket(category, res);
 
             sliderAdapter = new ImageSliderAdapter(this, imageSummaryList, BUCKET_URL, BUCKET_NAME);
-            sliderAdapter.notifyDataSetChanged();
+//            sliderAdapter.notifyDataSetChanged();
             imageSliderRecyclerView.setItemAnimator(new SlideInUpAnimator());
             imageSliderRecyclerView.setAdapter(sliderAdapter);
 
@@ -159,11 +159,12 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 category = categoryList[i];
-                                imageSummaryList.clear();
                                 imageSummaryList = getImagesFromS3Bucket(category, res);
+                                sliderAdapter.updateDataList(imageSummaryList);
+//                                sliderAdapter.notifyDataSetChanged();
 
-                                sliderAdapter = new ImageSliderAdapter(getApplicationContext(), imageSummaryList, BUCKET_URL, BUCKET_NAME);
-                                imageSliderRecyclerView.setAdapter(sliderAdapter);
+//                                sliderAdapter = new ImageSliderAdapter(getApplicationContext(), imageSummaryList, BUCKET_URL, BUCKET_NAME);
+//                                imageSliderRecyclerView.setAdapter(sliderAdapter);
 
                                 clearTabSelection();
                             }
@@ -434,6 +435,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                     }
                 }
             }
+
             return response.toString();
         }
 

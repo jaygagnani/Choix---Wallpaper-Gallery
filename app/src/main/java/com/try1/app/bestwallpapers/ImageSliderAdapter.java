@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -42,9 +41,6 @@ public class ImageSliderAdapter extends RecyclerView.Adapter<ImageSliderAdapter.
 
     @Override
     public void onBindViewHolder(ImageSliderAdapter.ViewHolder holder, int position) {
-//        Glide.with(context)
-//                .load(Uri.parse(bucketUrl + bucketName + "/" + imageSummaryList.get(position+1).toString()))
-//                .into(holder.wallpaperImage);
 
         Picasso.with(context)
                 .load(bucketUrl + bucketName + "/" + imageSummaryList.get(position+1).toString())
@@ -55,8 +51,12 @@ public class ImageSliderAdapter extends RecyclerView.Adapter<ImageSliderAdapter.
 
     @Override
     public int getItemCount() {
-        Toast.makeText(context, imageSummaryList.size()+"", Toast.LENGTH_SHORT).show();
         return imageSummaryList.size()-1;
+    }
+
+    public void updateDataList(ArrayList imageSummaryList){
+        this.imageSummaryList = imageSummaryList;
+        notifyDataSetChanged();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
