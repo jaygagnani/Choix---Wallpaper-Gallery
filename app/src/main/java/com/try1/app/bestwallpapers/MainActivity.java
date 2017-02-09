@@ -80,49 +80,47 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         progressBar.bringToFront();
         progressBar.setIndeterminate(true);
 
-        try {
-            categoryList = new GetCategory(this).execute().get();
-        }
-        catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-        category = categoryList[0];
-
-        imageSliderRecyclerView = (RecyclerView) findViewById(R.id.image_slider_recycler_view);
-        gridLayoutManager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
-
-        imageSliderRecyclerView.setLayoutManager(gridLayoutManager);
-        imageSliderRecyclerView.setHasFixedSize(true);
-
-        // Bottom Navigation
-        ahBottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation_tabs);
-        // Create items
-        AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.menu_category, android.R.drawable.ic_search_category_default, R.color.colorAccent);
-        AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.menu_rate_us, android.R.drawable.star_off, R.color.colorAccent);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.menu_share_app, android.R.drawable.ic_menu_share, R.color.colorAccent);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem(R.string.menu_suggest, android.R.drawable.ic_menu_edit, R.color.colorAccent);
-
-        ahBottomNavigation.addItem(item1);
-        ahBottomNavigation.addItem(item2);
-        ahBottomNavigation.addItem(item3);
-        ahBottomNavigation.addItem(item4);
-
-        ahBottomNavigation.setAccentColor(getResources().getColor(R.color.colorAccent));
-        ahBottomNavigation.setOnTabSelectedListener(this);
-        clearTabSelection();
-
-        imageSummaryList = new ArrayList<>();
-
         isOnline = false;
-        if(checkInternetConnected(this)){
+        if (checkInternetConnected(this)) {
             isOnline = isOnline();
         }
 
         if(isOnline) {
+
+            try {
+                categoryList = new GetCategory(this).execute().get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+
+            category = categoryList[0];
+
+            imageSliderRecyclerView = (RecyclerView) findViewById(R.id.image_slider_recycler_view);
+            gridLayoutManager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
+
+            imageSliderRecyclerView.setLayoutManager(gridLayoutManager);
+            imageSliderRecyclerView.setHasFixedSize(true);
+
+            // Bottom Navigation
+            ahBottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation_tabs);
+            // Create items
+            AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.menu_category, android.R.drawable.ic_search_category_default, R.color.colorAccent);
+            AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.menu_rate_us, android.R.drawable.star_off, R.color.colorAccent);
+            AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.menu_share_app, android.R.drawable.ic_menu_share, R.color.colorAccent);
+            AHBottomNavigationItem item4 = new AHBottomNavigationItem(R.string.menu_suggest, android.R.drawable.ic_menu_edit, R.color.colorAccent);
+
+            ahBottomNavigation.addItem(item1);
+            ahBottomNavigation.addItem(item2);
+            ahBottomNavigation.addItem(item3);
+            ahBottomNavigation.addItem(item4);
+
+            ahBottomNavigation.setAccentColor(getResources().getColor(R.color.colorAccent));
+            ahBottomNavigation.setOnTabSelectedListener(this);
+            clearTabSelection();
+
+            imageSummaryList = new ArrayList<>();
 
             imageSummaryList = getImagesFromS3Bucket(category, res);
 
@@ -337,8 +335,10 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
     }
 
     public void clearTabSelection(){
-        ahBottomNavigation.setCurrentItem(-1);
-        ahBottomNavigation.clearFocus();
+        if(isOnline){
+            ahBottomNavigation.setCurrentItem(-1);
+            ahBottomNavigation.clearFocus();
+        }
     }
 
     @Override
@@ -361,6 +361,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
 
         clearTabSelection();
     }
+
 
     private class GetCategory extends AsyncTask<Void, Void, String[]>{
 
