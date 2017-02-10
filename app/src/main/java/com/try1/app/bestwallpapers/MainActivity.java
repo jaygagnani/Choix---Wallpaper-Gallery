@@ -80,13 +80,24 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         progressBar.bringToFront();
         progressBar.setIndeterminate(true);
 
+        imageSliderRecyclerView = (RecyclerView) findViewById(R.id.image_slider_recycler_view);
+
+        gridLayoutManager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
+
+        imageSliderRecyclerView.setLayoutManager(gridLayoutManager);
+        imageSliderRecyclerView.setHasFixedSize(true);
+
         isOnline = false;
         if (checkInternetConnected(this)) {
             isOnline = isOnline();
         }
 
-        if(isOnline) {
+        createUI();
 
+    }
+
+    public void createUI(){
+        if(isOnline) {
             try {
                 categoryList = new GetCategory(this).execute().get();
             } catch (InterruptedException e) {
@@ -96,12 +107,6 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
             }
 
             category = categoryList[0];
-
-            imageSliderRecyclerView = (RecyclerView) findViewById(R.id.image_slider_recycler_view);
-            gridLayoutManager = new StaggeredGridLayoutManager(3, OrientationHelper.VERTICAL);
-
-            imageSliderRecyclerView.setLayoutManager(gridLayoutManager);
-            imageSliderRecyclerView.setHasFixedSize(true);
 
             // Bottom Navigation
             ahBottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation_tabs);
@@ -130,14 +135,25 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
             imageSliderRecyclerView.setAdapter(sliderAdapter);
 
             getAds();
-
         }
         else{
             // if no internet connection
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setCancelable(false);
+            alertDialogBuilder.setMessage("Please check your internet connection and try again.");
+            alertDialogBuilder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    if (checkInternetConnected(getApplicationContext())) {
+                        isOnline = isOnline();
+                    }
+                    createUI();
+                }
+            });
+            alertDialogBuilder.show();
             Toast.makeText(this, "No internet available", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     @Override
     public boolean onTabSelected(int position, boolean wasSelected) {
@@ -300,7 +316,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         return isConnected;
     }
 
-    public boolean isOnline(){
+    public static boolean isOnline(){
         Runtime runtime = Runtime.getRuntime();
         try{
             Process ipProcess = runtime.exec("system/bin/ping -c 1 8.8.8.8");
@@ -361,7 +377,6 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
 
         clearTabSelection();
     }
-
 
     private class GetCategory extends AsyncTask<Void, Void, String[]>{
 
