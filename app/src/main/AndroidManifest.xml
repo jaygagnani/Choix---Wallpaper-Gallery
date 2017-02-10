@@ -13,16 +13,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <!--<receiver android:name=".BoradcastRecievers.ConnectivityReceiver"-->
-            <!--android:label="ConnectivityReceiver">-->
-
-            <!--<intent-filter>-->
-                <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
-                <!--&lt;!&ndash;<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />&ndash;&gt;-->
-            <!--</intent-filter>-->
-
-        <!--</receiver>-->
-
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation"

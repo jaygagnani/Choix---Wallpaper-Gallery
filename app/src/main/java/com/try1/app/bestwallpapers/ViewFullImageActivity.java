@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -53,8 +52,8 @@ public class ViewFullImageActivity extends AppCompatActivity implements View.OnC
         fabSetAsHomeWallpaper = (FloatingActionButton) findViewById(R.id.fab_set_as_home_wallpaper);
         fabSetAsHomeWallpaper.setOnClickListener(this);
 
-        fabSetAsLockWallpaper = (FloatingActionButton) findViewById(R.id.fab_set_as_lock_wallpaper);
-        fabSetAsLockWallpaper.setOnClickListener(this);
+//        fabSetAsLockWallpaper = (FloatingActionButton) findViewById(R.id.fab_set_as_lock_wallpaper);
+//        fabSetAsLockWallpaper.setOnClickListener(this);
 
     }
 
@@ -83,29 +82,29 @@ public class ViewFullImageActivity extends AppCompatActivity implements View.OnC
             }
 
         }
-        else if(view.getId() == R.id.fab_set_as_lock_wallpaper){
-            try {
-                bitmap = new GetFullImage(context).execute(fullImageUrl).get();
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    wallpaperManager.setBitmap(bitmap, null, false, WallpaperManager.FLAG_LOCK);
-                    Snackbar.make(view, "Image set as lock screen wallpaper.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-                else{
-                    Snackbar.make(view, "Your device does not supports this feature.", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                }
-            }
-            catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+//        else if(view.getId() == R.id.fab_set_as_lock_wallpaper){
+//            try {
+//                bitmap = new GetFullImage(context).execute(fullImageUrl).get();
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                    wallpaperManager.setBitmap(bitmap, null, false, WallpaperManager.FLAG_LOCK);
+//                    Snackbar.make(view, "Image set as lock screen wallpaper.", Snackbar.LENGTH_LONG)
+//                            .setAction("Action", null).show();
+//                }
+//                else{
+//                    Snackbar.make(view, "Your device does not supports this feature.", Snackbar.LENGTH_LONG)
+//                            .setAction("Action", null).show();
+//                }
+//            }
+//            catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            catch (ExecutionException e) {
+//                e.printStackTrace();
+//            }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     private class GetFullImage extends AsyncTask<String, Void, Bitmap> {
