@@ -5,9 +5,9 @@
     <string name="empty_string"></string>
 
     <string name="menu_category">Category</string>
-    <string name="menu_rate_us">Rate</string>
-    <string name="menu_share_app">Share</string>
-    <string name="menu_suggest">Suggest</string>
+    <string name="menu_rate_us">Rate App</string>
+    <string name="menu_share_app">Share App</string>
+    <string name="menu_suggest">Request</string>
 
     <string name="home_banner_ad_unit_id">ca-app-pub-4256064271529904/8174053072</string>
     <string name="viewImage_top_banner_ad_unit_id">ca-app-pub-4256064271529904/3427625873</string>

@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
             // Bottom Navigation
             ahBottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation_tabs);
             // Create items
-            AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.menu_category, android.R.drawable.ic_search_category_default, R.color.colorAccent);
+            AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.menu_category, android.R.drawable.ic_menu_sort_by_size, R.color.colorAccent);
             AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.menu_rate_us, android.R.drawable.star_off, R.color.colorAccent);
             AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.menu_share_app, android.R.drawable.ic_menu_share, R.color.colorAccent);
             AHBottomNavigationItem item4 = new AHBottomNavigationItem(R.string.menu_suggest, android.R.drawable.ic_menu_edit, R.color.colorAccent);
@@ -293,15 +293,14 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
 
     public void sendSuggestion() {
         Intent suggestionIntent = new Intent(Intent.ACTION_SEND);
-        suggestionIntent.setData(Uri.parse("mailto:"));
+//        suggestionIntent.setData(Uri.parse("mailto:"));
+        suggestionIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"monkmad2015@gmail.com"});
+        suggestionIntent.putExtra(Intent.EXTRA_SUBJECT, "Choix: Request for wallpaper design");
         suggestionIntent.setType("text/plain");
-//        suggestionIntent.addFlags(Intent.CATEGORY_APP_EMAIL);
-        suggestionIntent.putExtra(Intent.EXTRA_EMAIL, "monkmad2015@gmail.com");
-        suggestionIntent.putExtra(Intent.EXTRA_SUBJECT, "Choix: Suggestion for wallpaper");
 
         try{
-            startActivity(Intent.createChooser(suggestionIntent, "Send mail..."));
-            finish();
+            startActivity(Intent.createChooser(suggestionIntent, "Mail us your request"));
+//            finish();
         }
         catch (ActivityNotFoundException e){
             Toast.makeText(MainActivity.this, "There is no email client installed.", Toast.LENGTH_SHORT).show();
