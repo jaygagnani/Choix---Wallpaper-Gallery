@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:fitsSystemWindows="true"
-        tools:context="com.try1.app.bestwallpapers.MainActivity">
+        tools:context="com.app.monkmad.choix.MainActivity">
 
         <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
