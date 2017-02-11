@@ -43,8 +43,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator;
-
 public class MainActivity extends AppCompatActivity implements AHBottomNavigation.OnTabSelectedListener {
 
     private final String TAG = getClass().getSimpleName();
@@ -131,7 +129,6 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
 
             sliderAdapter = new ImageSliderAdapter(this, imageSummaryList, BUCKET_URL, BUCKET_NAME);
 //            sliderAdapter.notifyDataSetChanged();
-            imageSliderRecyclerView.setItemAnimator(new SlideInUpAnimator());
             imageSliderRecyclerView.setAdapter(sliderAdapter);
 
             getAds();
