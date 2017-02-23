@@ -14,6 +14,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -28,24 +30,18 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
+import com.google.firebase.iid.FirebaseInstanceId;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
+
 
 public class MainActivity extends AppCompatActivity implements AHBottomNavigation.OnTabSelectedListener {
 
     private final String TAG = getClass().getSimpleName();
+
+    Bundle getExtras;
 
     private RecyclerView imageSliderRecyclerView;
 
@@ -66,13 +62,47 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
 
     private boolean isOnline;
 
+    DisplayMetrics displayMetrics;
+    float height, width;
+
     AmazonS3Client s3;
     AWSCredentials awsCredentials;
+
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        height = displayMetrics.heightPixels;
+        width = displayMetrics.widthPixels;
+
+        if(height>=1920 && width>=1080){
+            res = "xxhdpi";
+        }
+        else if(height>=1280 && width>=920){
+            res = "xhdpi";
+        }
+        else if(height>=800 && width>=480){
+            res = "hdpi";
+        }
+        else if(height>=480 && width>=320){
+            res = "mdpi";
+        }
+        else if(height>=320 && width>=240){
+            res = "ldpi";
+        }
+        else{
+            res = "mdpi";
+        }
+
+        getExtras = getIntent().getExtras();
+
+        categoryList = getExtras.getStringArray("edited_category_names");
+        actualCategoryNames = getExtras.getStringArray("category_names");
 
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         progressBar.bringToFront();
@@ -85,26 +115,26 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         imageSliderRecyclerView.setLayoutManager(gridLayoutManager);
         imageSliderRecyclerView.setHasFixedSize(true);
 
+        intent = getIntent();
+
         isOnline = false;
         if (checkInternetConnected(this)) {
             isOnline = isOnline();
         }
 
         createUI();
-
     }
 
     public void createUI(){
         if(isOnline) {
-            try {
-                categoryList = new GetCategory(this).execute().get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
 
-            category = categoryList[0];
+            Log.d(TAG, "FCM token : " + FirebaseInstanceId.getInstance().getToken());
+            if(SplashActivity.sharedPreferences.contains(getString(R.string.preference_file_key))){
+                category = SplashActivity.sharedPreferences.getString(getString(R.string.preference_file_key), categoryList[0]);
+            }
+            else{
+                category = categoryList[0];
+            }
 
             // Bottom Navigation
             ahBottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_navigation_tabs);
@@ -172,10 +202,6 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                                 category = categoryList[i];
                                 imageSummaryList = getImagesFromS3Bucket(category, res);
                                 sliderAdapter.updateDataList(imageSummaryList);
-//                                sliderAdapter.notifyDataSetChanged();
-
-//                                sliderAdapter = new ImageSliderAdapter(getApplicationContext(), imageSummaryList, BUCKET_URL, BUCKET_NAME);
-//                                imageSliderRecyclerView.setAdapter(sliderAdapter);
 
                                 clearTabSelection();
                             }
@@ -256,7 +282,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         }
     }
 
-    public void getAds(){
+    private void getAds(){
         MobileAds.initialize(getApplicationContext(), getResources().getString(R.string.firebase_admob_app_id));
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice("DC712D7CC1728E3D57DD338A75F0C46E")
@@ -289,14 +315,11 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
     }
 
     public void sendSuggestion() {
-        Intent suggestionIntent = new Intent(Intent.ACTION_SEND);
-//        suggestionIntent.setData(Uri.parse("mailto:"));
-        suggestionIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"monkmad2015@gmail.com"});
-        suggestionIntent.putExtra(Intent.EXTRA_SUBJECT, "Choix: Request for wallpaper design");
-        suggestionIntent.setType("text/plain");
+        Intent suggestionIntent = new Intent(Intent.ACTION_SENDTO);
+        suggestionIntent.setData(Uri.parse("mailto:" + Uri.encode("monkmad2015@gmail.com") + "?subject=" + Uri.encode("Choix: Request for wallpaper design")));
 
         try{
-            startActivity(Intent.createChooser(suggestionIntent, "Mail us your request"));
+            startActivity(suggestionIntent);
 //            finish();
         }
         catch (ActivityNotFoundException e){
@@ -374,101 +397,4 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         clearTabSelection();
     }
 
-    private class GetCategory extends AsyncTask<Void, Void, String[]>{
-
-        Context context;
-
-        URL url;
-        InputStream inputStream;
-        HttpURLConnection urlConnection;
-        String result;
-
-        String[] categoryList;
-
-        private GetCategory(Context context){
-            this.context = context;
-            result = null;
-            inputStream = null;
-        }
-
-        @Override
-        protected String[] doInBackground(Void... voids) {
-
-            try {
-                url = new URL("http://52.38.86.215/api/choix");
-                urlConnection = (HttpURLConnection) url.openConnection();
-
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setDoInput(true);
-                urlConnection.connect();
-
-                int responseCode = urlConnection.getResponseCode();
-                if(responseCode != HttpURLConnection.HTTP_OK){
-                    Toast.makeText(context, "Cannot connect to the network", Toast.LENGTH_SHORT).show();
-                    throw new IOException("HTTP error code " + responseCode);
-                }
-                inputStream = urlConnection.getInputStream();
-                if(inputStream != null){
-                    result = readStream(inputStream);
-                }
-
-                return convertString(result);
-            }
-            catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-
-        private String readStream(InputStream in) {
-            BufferedReader reader = null;
-            StringBuffer response = new StringBuffer();
-            try {
-                reader = new BufferedReader(new InputStreamReader(in));
-                String line = "";
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            return response.toString();
-        }
-
-        private String[] convertString(String result) throws JSONException {
-            JSONObject jsonObject = new JSONObject(result);
-            JSONArray jsonArray = jsonObject.getJSONArray("response");
-            JSONArray jsonArray1 = jsonArray.getJSONArray(0);
-
-            String temp;
-            int arrayLength = jsonArray1.length();
-            categoryList = new String[arrayLength];
-            actualCategoryNames = new String[arrayLength];
-
-            for(int i=0; i<arrayLength; i++){
-                actualCategoryNames[i] = jsonArray1.getString(i);
-                temp = jsonArray1.getString(i).toLowerCase();
-                temp = temp.replaceAll("[^a-zA-Z]", "");
-                categoryList[i] = temp;
-            }
-
-            return categoryList;
-        }
-    }
 }

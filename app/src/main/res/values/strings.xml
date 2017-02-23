@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Choix - A Wallpaper of Choice!</string>
+    <string name="app_name">Choix - Wallpapers of Choice!</string>
     <string name="title_activity_main">Choix</string>
     <string name="action_settings">Settings</string>
     <string name="empty_string"></string>
@@ -19,5 +19,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="title_activity_image_gallery">ImageGalleryActivity</string>
+
+    <string name="preference_file_key">category</string>
 
 </resources>
